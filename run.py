@@ -1,7 +1,8 @@
-from flask import Flask
-from threading import Thread
-from highrise.__main__ import *
+import os
 import time
+from threading import Thread
+from flask import Flask
+from highrise.__main__ import *
 
 
 class WebServer():
@@ -14,7 +15,8 @@ class WebServer():
       return "Funcionando"
 
   def run(self) -> None:
-    self.app.run(host='0.0.0.0', port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    self.app.run(host='0.0.0.0', port=port)
 
   def keep_alive(self):
     t = Thread(target=self.run)
@@ -32,7 +34,7 @@ class RunBot():
         BotDefinition(
             getattr(import_module(self.bot_file), self.bot_class)(),
             self.room_id, self.bot_token)
-    ]  # More BotDefinition classes can be added to the definitions list
+    ]
 
   def run_loop(self) -> None:
     while True:
@@ -43,7 +45,7 @@ class RunBot():
         print("Error: ", e)
         time.sleep(5)
 
+
 if __name__ == "__main__":
   WebServer().keep_alive()
-
   RunBot().run_loop()
